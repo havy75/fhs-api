@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import uvicorn
+from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
