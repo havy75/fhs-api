@@ -35,9 +35,9 @@ app.include_router(auth.router, prefix="/routers/auth", tags=["auth"])
 app.include_router(salary.router, prefix="/routers/salary", tags=["salary"])
 app.include_router(employee.router, prefix="/routers/employee", tags=["employee"])
 
-@app.get("/")
-def read_root():
-    return {"message": "Hello World"}
+@app.get("/", include_in_schema=False)
+def root():
+    return JSONResponse(content={"status": "ok"})
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
