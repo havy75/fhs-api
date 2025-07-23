@@ -3,6 +3,7 @@ from schemas.employee import EmployeeBase
 from schemas.salary import SalaryResponse
 from schemas.archivement import ArchivementResponse
 from schemas.quater import Quarter
+from schemas.yearbonus import YearBonus
 from typing import Optional, List
 from datetime import datetime, date
 
@@ -179,3 +180,48 @@ def get_quater_by_empid(empid: str, year:int, quater:int) -> Quarter:
         Work=parse_salary(fields[12]),
         Pay=parse_salary(fields[13])
     )
+
+def get_year_bonus_by_empid(empid: int, year: int) -> YearBonus:
+    empid_str = f"{empid:05d}"  # giống {input.EmpId:D5} trong C#
+    
+    url_bef = f"{base_url}/s19/VNW00{empid_str}vkokvbefvkokv{year}"
+    url_aft = f"{base_url}/s19/VNW00{empid_str}vkokvaftvkokv{year}"
+    
+    # Lấy dữ liệu BEF
+    response_bef = requests.get(url_bef)
+    response_bef.encoding = 'utf-8'
+    if response_bef.status_code != 200 or not response_bef.text:
+        raise ValueError("Không lấy được dữ liệu BEF")
+
+    print(response_bef.text)
+
+    parts = response_bef.text.strip().split('o|o')[0].split('|')
+    if len(parts) < 11:
+        raise ValueError("Thiếu dữ liệu BEF")
+
+    result = YearBonus(
+        mnv=parts[0],
+        tlcb=parts[1],
+        stdltbtn=parts[2],
+        capbac=parts[3],
+        tile=parts[4],
+        ktsongay=parts[5],
+        ktsotien=parts[6],
+        xpsongay=parts[7],
+        xpsotien=parts[8],
+        stienthuong=parts[9],
+        tpnttt=parts[10]
+    )
+
+    # Lấy dữ liệu AFT
+    response_aft = requests.get(url_aft)
+    
+    print(response_aft.text)
+    
+    response_aft.encoding = 'utf-8'
+    if response_aft.status_code == 200 and response_aft.text.strip():
+        aft_parts = response_aft.text.strip().split('o|o')[0].split('|')
+        if aft_parts:
+            result.tpntst = aft_parts[-1]
+
+    return result

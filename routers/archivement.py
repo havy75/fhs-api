@@ -6,8 +6,8 @@ from services.hrs_api import get_archivement_by_empid
 
 router = APIRouter()
 
-@router.get("/employee/{keyword}", response_model=List[ArchivementResponse])
-def get_employee(keyword: str):
+@router.get("/{keyword}", response_model=List[ArchivementResponse])
+def get_archivement(keyword: str):
     data = get_archivement_by_empid(keyword)
     if not data:
         return {"error": "Không tìm thấy nhân viên"}

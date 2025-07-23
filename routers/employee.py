@@ -6,9 +6,9 @@ from services.hrs_api import get_employee_by_keyword
 
 router = APIRouter()
 
-@router.get("/employee/{keyword}", response_model=EmployeeBase)
-def get_employee(keyword: str):
-    data = get_employee_by_keyword(keyword)
+@router.get("/{empid}", response_model=EmployeeBase)
+def get_employee(empid: str):
+    data = get_employee_by_keyword(empid)
     if not data:
         return {"error": "Không tìm thấy nhân viên"}
     return data

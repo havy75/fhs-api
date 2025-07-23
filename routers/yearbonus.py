@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.salary import SalaryResponse
-from services.hrs_api import get_salary_by_empid
+from schemas.yearbonus import YearBonus
+from services.hrs_api import get_year_bonus_by_empid
 
 router = APIRouter()
 
-@router.get("/{keyword}/{year}/{month}", response_model=SalaryResponse)
-def get_salary(keyword: str, year: str, month: str):
-    try :
-        data = get_salary_by_empid(keyword, year, month)
+@router.get("/{empid}/{year}", response_model=YearBonus)
+def get_year_bonus(empid: int, year: int):
+    try:
+        data = get_year_bonus_by_empid(empid, year)
         return data
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
