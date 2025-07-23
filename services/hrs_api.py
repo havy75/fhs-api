@@ -1,8 +1,11 @@
 import requests
 from schemas.employee import EmployeeBase
 from schemas.salary import SalaryResponse
-from typing import Optional
+from schemas.archivement import ArchivementResponse,ArchivementListResponse
+from typing import Optional, List
 from datetime import datetime, date
+
+base_url = "https://www.fhs.com.tw/ads/api/Furnace/rest/json/hr"
 
 def parse_date(raw: str) -> Optional[date]:
     try:
@@ -20,7 +23,7 @@ def parse_salary(s: str) -> Optional[float]:
 
 def get_employee_by_keyword(keyword: str) -> EmployeeBase:
     emp_id = str(keyword).zfill(5)
-    url = f"https://www.fhs.com.tw/ads/api/Furnace/rest/json/hr/s10/VNW00{emp_id}"
+    url = f"{base_url}/s10/VNW00{emp_id}"
     response = requests.get(url)
     response.encoding = 'utf-8'
     raw_text = response.text
@@ -62,7 +65,7 @@ def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResponse:
     emp_id = str(keyword).zfill(5)
     month = month.zfill(2)
 
-    url = f"https://www.fhs.com.tw/ads/api/Furnace/rest/json/hr/s16/VNW00{emp_id}vkokv{year.zfill(4)}-{month.zfill(2)}"
+    url = f"{base_url}/s16/VNW00{emp_id}vkokv{year.zfill(4)}-{month.zfill(2)}"
     response = requests.get(url)
     response.encoding = 'utf-8'
 
@@ -127,3 +130,26 @@ def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResponse:
     )
 
     return result
+
+def get_archivement_by_empid(empid: str) -> List[ArchivementResponse]:
+    url = f"{base_url}/s11/VNW00{empid.zfill(5)}"
+    response = requests.get(url)
+    response.encoding = 'utf-8'
+
+    if response.status_code != 200 or not response.text:
+        raise ValueError("Không lấy được dữ liệu từ API")
+
+    resp = response.text.strip()
+    fields = [f for f in resp.split('o|o') if f.strip()]
+
+    print(resp)
+
+    results = []
+
+    for field in fields:
+        if '|' in field:
+            year, score = field.split('|')
+            results.append(ArchivementResponse(year=year, score=score))
+
+    return results
+
