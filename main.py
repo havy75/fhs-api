@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 logger = logging.getLogger(__name__)
 
 try:
-    from routers import auth, salary, employee,archivement
+    from routers import auth, salary, employee,archivement,quater
     # from .database.session import create_tables
 except ImportError as e:
     logger.error(f"Failed to import required modules: {str(e)}")
@@ -36,6 +36,7 @@ app.include_router(auth.router, prefix="/routers/auth", tags=["auth"])
 app.include_router(salary.router, prefix="/routers/salary", tags=["salary"])
 app.include_router(employee.router, prefix="/routers/employee", tags=["employee"])
 app.include_router(archivement.router, prefix="/routers/archivement", tags=["archivement"])
+app.include_router(quater.router, prefix="/routers/quater", tags=["quater"])
 
 @app.get("/", include_in_schema=False)
 def root():

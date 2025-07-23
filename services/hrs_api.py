@@ -1,7 +1,8 @@
 import requests
 from schemas.employee import EmployeeBase
 from schemas.salary import SalaryResponse
-from schemas.archivement import ArchivementResponse,ArchivementListResponse
+from schemas.archivement import ArchivementResponse
+from schemas.quater import Quarter
 from typing import Optional, List
 from datetime import datetime, date
 
@@ -153,3 +154,28 @@ def get_archivement_by_empid(empid: str) -> List[ArchivementResponse]:
 
     return results
 
+def get_quater_by_empid(empid: str, year:int, quater:int) -> Quarter:
+    url = f"{base_url}/s24/VNW00{empid.zfill(5)}vkokv{year}vkokvqr{quater}"
+    response = requests.get(url)
+    response.encoding = 'utf-8'
+
+    if response.status_code != 200 or not response.text:
+        raise ValueError("Không lấy được dữ liệu từ API")
+
+    resp = response.text.strip()
+
+    print(resp)
+
+    fields = resp.split('|')
+
+    if len(fields) < 13:
+        raise ValueError("Dữ liệu không đầy đủ")
+
+    return Quarter(
+        FirstMonth=parse_salary(fields[0]),
+        SecondMonth=parse_salary(fields[1]),
+        ThirdMonth=parse_salary(fields[2]),
+        Percentage=parse_salary(fields[3]),
+        Work=parse_salary(fields[12]),
+        Pay=parse_salary(fields[13])
+    )
