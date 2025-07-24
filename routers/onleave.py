@@ -9,7 +9,7 @@ router = APIRouter()
 from fastapi import HTTPException
 
 @router.get("/{empid}/{year}", response_model=List[OnLeaveResp])
-def get_on_leave(empid: str, year: int):
+def get_on_leave(empid: int, year: int):
     try:
         data = get_on_leave_by_empid(empid, year)
         return data

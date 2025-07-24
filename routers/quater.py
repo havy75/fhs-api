@@ -7,7 +7,7 @@ router = APIRouter()
 from fastapi import HTTPException
 
 @router.get("/{empid}/{year}/{quater}", response_model=QuarterResp)
-def get_quater(empid: str, year: int, quater: int):
+def get_quater(empid: int, year: int, quater: int):
     try:
         data = get_quater_by_empid(empid, year, quater)
         return data

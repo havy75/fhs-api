@@ -5,6 +5,7 @@ from schemas.archivement import ArchivementResp
 from schemas.quater import QuarterResp
 from schemas.yearbonus import YearBonusResp
 from schemas.onleave import OnLeaveResp
+from schemas.orderlunch import OrderLunchResp
 from typing import Optional, List
 from datetime import datetime, date
 
@@ -27,9 +28,8 @@ def parse_salary(s: str) -> Optional[float]:
         return -1
 
 
-def get_employee_by_keyword(keyword: str) -> EmployeeResp:
-    emp_id = str(keyword).zfill(5)
-    url = f"{base_url}/s10/VNW00{emp_id}"
+def get_employee_by_keyword(empid: int) -> EmployeeResp:
+    url = f"{base_url}/s10/VNW00{empid:05d}"
     response = requests.get(url)
     response.encoding = "utf-8"
     raw_text = response.text
@@ -68,11 +68,8 @@ def get_employee_by_keyword(keyword: str) -> EmployeeResp:
     return employee
 
 
-def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResp:
-    emp_id = str(keyword).zfill(5)
-    month = month.zfill(2)
-
-    url = f"{base_url}/s16/VNW00{emp_id}vkokv{year.zfill(4)}-{month.zfill(2)}"
+def get_salary_by_empid(empid: int, year: int, month: int) -> SalaryResp:
+    url = f"{base_url}/s16/VNW00{empid:05d}vkokv{year}-{month:02d}"
     response = requests.get(url)
     response.encoding = "utf-8"
 
@@ -139,8 +136,8 @@ def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResp:
     return result
 
 
-def get_archivement_by_empid(empid: str) -> List[ArchivementResp]:
-    url = f"{base_url}/s11/VNW00{empid.zfill(5)}"
+def get_archivement_by_empid(empid: int) -> List[ArchivementResp]:
+    url = f"{base_url}/s11/VNW00{empid:05d}"
     response = requests.get(url)
     response.encoding = "utf-8"
 
@@ -162,8 +159,8 @@ def get_archivement_by_empid(empid: str) -> List[ArchivementResp]:
     return results
 
 
-def get_quater_by_empid(empid: str, year: int, quater: int) -> QuarterResp:
-    url = f"{base_url}/s24/VNW00{empid.zfill(5)}vkokv{year}vkokvqr{quater}"
+def get_quater_by_empid(empid: int, year: int, quater: int) -> QuarterResp:
+    url = f"{base_url}/s24/VNW00{empid:05d}vkokv{year}vkokvqr{quater}"
     response = requests.get(url)
     response.encoding = "utf-8"
 
@@ -235,8 +232,8 @@ def get_year_bonus_by_empid(empid: int, year: int) -> YearBonusResp:
     return result
 
 
-def get_on_leave_by_empid(empid: str, year: int) -> List[OnLeaveResp]:
-    url = f"{base_url}/s02/VNW00{empid.zfill(5)}vkokv{year}vkokvb"
+def get_on_leave_by_empid(empid: int, year: int) -> List[OnLeaveResp]:
+    url = f"{base_url}/s02/VNW00{empid:05d}vkokv{year}vkokvb"
     response = requests.get(url)
     response.encoding = "utf-8"
 
@@ -256,3 +253,28 @@ def get_on_leave_by_empid(empid: str, year: int) -> List[OnLeaveResp]:
             results.append(OnLeaveResp(code=code, name=name, quantity=quantity))
 
     return results
+
+
+def get_user_lunch_by_date_place(date: str, place: str) -> List[OrderLunchResp]:
+    url = f"{base_url}/s27/{date}vkv{place.upper()}vkvVN"
+    response = requests.get(url)
+    response.encoding = "utf-8"
+
+    if response.status_code != 200 or not response.text.strip():
+        raise ValueError("Không lấy được dữ liệu hoặc dữ liệu rỗng")
+
+    data = response.text.strip().split("o|o")
+    result = []
+    print(data)
+
+    for item in data:
+        fields = item.split("|")
+        if len(fields) < 4:
+            continue
+        result.append(
+            OrderLunchResp(
+                id_emp=fields[1], name=fields[1], time=fields[2], node=fields[3]
+            )
+        )
+
+    return result

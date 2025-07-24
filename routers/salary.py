@@ -5,7 +5,7 @@ from services.hrs_api import get_salary_by_empid
 router = APIRouter()
 
 @router.get("/{empid}/{year}/{month}", response_model=SalaryResp)
-def get_salary(empid: str, year: str, month: str):
+def get_salary(empid: int, year: int, month: int):
     try :
         data = get_salary_by_empid(empid, year, month)
         return data

@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 logger = logging.getLogger(__name__)
 
 try:
-    from routers import auth, salary, employee, archivement, quater, yearbonus, onleave
+    from routers import auth, salary, employee, archivement, quater, yearbonus, onleave,orderlunch
 
     # from .database.session import create_tables
 except ImportError as e:
@@ -40,6 +40,7 @@ app.include_router(archivement.router, prefix="/api/archivement", tags=["archive
 app.include_router(quater.router, prefix="/api/quater", tags=["quater"])
 app.include_router(yearbonus.router, prefix="/api/yearbonus", tags=["yearbonus"])
 app.include_router(onleave.router, prefix="/api/onleave", tags=["onleave"])
+app.include_router(orderlunch.router, prefix="/api/orderlunch", tags=["orderlunch"])
 
 @app.get("/", include_in_schema=False)
 def root():
