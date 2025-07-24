@@ -1,13 +1,15 @@
 import requests
-from schemas.employee import EmployeeBase
-from schemas.salary import SalaryResponse
-from schemas.archivement import ArchivementResponse
-from schemas.quater import Quarter
-from schemas.yearbonus import YearBonus
+from schemas.employee import EmployeeResp
+from schemas.salary import SalaryResp
+from schemas.archivement import ArchivementResp
+from schemas.quater import QuarterResp
+from schemas.yearbonus import YearBonusResp
+from schemas.onleave import OnLeaveResp
 from typing import Optional, List
 from datetime import datetime, date
 
 base_url = "https://www.fhs.com.tw/ads/api/Furnace/rest/json/hr"
+
 
 def parse_date(raw: str) -> Optional[date]:
     try:
@@ -17,26 +19,28 @@ def parse_date(raw: str) -> Optional[date]:
         pass
     return None
 
+
 def parse_salary(s: str) -> Optional[float]:
     try:
-        return float(s.replace(',', '')) if s else 0
+        return float(s.replace(",", "")) if s else 0
     except:
         return -1
 
-def get_employee_by_keyword(keyword: str) -> EmployeeBase:
+
+def get_employee_by_keyword(keyword: str) -> EmployeeResp:
     emp_id = str(keyword).zfill(5)
     url = f"{base_url}/s10/VNW00{emp_id}"
     response = requests.get(url)
-    response.encoding = 'utf-8'
+    response.encoding = "utf-8"
     raw_text = response.text
 
-    print(raw_text.split('o|o')[0])
+    print(raw_text.split("o|o")[0])
 
-    fields = raw_text.strip().split('o|o')[0].split('|')
+    fields = raw_text.strip().split("o|o")[0].split("|")
     if len(fields) < 22:
         raise ValueError("Dữ liệu trả về không đầy đủ")
 
-    employee = EmployeeBase(
+    employee = EmployeeResp(
         chinese_name=fields[0],
         vietnamese_name=fields[1],
         date_of_birth=parse_date(fields[2]),
@@ -63,29 +67,30 @@ def get_employee_by_keyword(keyword: str) -> EmployeeBase:
 
     return employee
 
-def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResponse:
+
+def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResp:
     emp_id = str(keyword).zfill(5)
     month = month.zfill(2)
 
     url = f"{base_url}/s16/VNW00{emp_id}vkokv{year.zfill(4)}-{month.zfill(2)}"
     response = requests.get(url)
-    response.encoding = 'utf-8'
+    response.encoding = "utf-8"
 
     if response.status_code != 200 or not response.text:
         raise ValueError("Không lấy được dữ liệu từ API")
 
     # Tách dữ liệu
     resp = response.text.strip()
-    fields = resp.split('o|o')[0].split('|')
+    fields = resp.split("o|o")[0].split("|")
 
-    print(resp.split('o|o')[0])
+    print(resp.split("o|o")[0])
 
     # Kiểm tra đủ số lượng field
     if len(fields) < 45:
         raise ValueError("Dữ liệu không đầy đủ")
 
     # Chuẩn bị dữ liệu phẳng
-    result = SalaryResponse(
+    result = SalaryResp(
         tien_phat_thuc_te=parse_salary(fields[43]),
         tong_so_luong=parse_salary(fields[32]),
         luong_co_ban=parse_salary(fields[44]),
@@ -128,37 +133,39 @@ def get_salary_by_empid(keyword: str, year: str, month: str) -> SalaryResponse:
         cong_doan=parse_salary(fields[39]),
         khac=parse_salary(fields[40]),
         nghi_phep=parse_salary(fields[41]),
-        thue_thu_nhap=parse_salary(fields[42])
+        thue_thu_nhap=parse_salary(fields[42]),
     )
 
     return result
 
-def get_archivement_by_empid(empid: str) -> List[ArchivementResponse]:
+
+def get_archivement_by_empid(empid: str) -> List[ArchivementResp]:
     url = f"{base_url}/s11/VNW00{empid.zfill(5)}"
     response = requests.get(url)
-    response.encoding = 'utf-8'
+    response.encoding = "utf-8"
 
     if response.status_code != 200 or not response.text:
         raise ValueError("Không lấy được dữ liệu từ API")
 
     resp = response.text.strip()
-    fields = [f for f in resp.split('o|o') if f.strip()]
+    fields = [f for f in resp.split("o|o") if f.strip()]
 
     print(resp)
 
     results = []
 
     for field in fields:
-        if '|' in field:
-            year, score = field.split('|')
-            results.append(ArchivementResponse(year=year, score=score))
+        if "|" in field:
+            year, score = field.split("|")
+            results.append(ArchivementResp(year=year, score=score))
 
     return results
 
-def get_quater_by_empid(empid: str, year:int, quater:int) -> Quarter:
+
+def get_quater_by_empid(empid: str, year: int, quater: int) -> QuarterResp:
     url = f"{base_url}/s24/VNW00{empid.zfill(5)}vkokv{year}vkokvqr{quater}"
     response = requests.get(url)
-    response.encoding = 'utf-8'
+    response.encoding = "utf-8"
 
     if response.status_code != 200 or not response.text:
         raise ValueError("Không lấy được dữ liệu từ API")
@@ -167,39 +174,40 @@ def get_quater_by_empid(empid: str, year:int, quater:int) -> Quarter:
 
     print(resp)
 
-    fields = resp.split('|')
+    fields = resp.split("|")
 
     if len(fields) < 13:
         raise ValueError("Dữ liệu không đầy đủ")
 
-    return Quarter(
+    return QuarterResp(
         FirstMonth=parse_salary(fields[0]),
         SecondMonth=parse_salary(fields[1]),
         ThirdMonth=parse_salary(fields[2]),
         Percentage=parse_salary(fields[3]),
         Work=parse_salary(fields[12]),
-        Pay=parse_salary(fields[13])
+        Pay=parse_salary(fields[13]),
     )
 
-def get_year_bonus_by_empid(empid: int, year: int) -> YearBonus:
+
+def get_year_bonus_by_empid(empid: int, year: int) -> YearBonusResp:
     empid_str = f"{empid:05d}"  # giống {input.EmpId:D5} trong C#
-    
+
     url_bef = f"{base_url}/s19/VNW00{empid_str}vkokvbefvkokv{year}"
     url_aft = f"{base_url}/s19/VNW00{empid_str}vkokvaftvkokv{year}"
-    
+
     # Lấy dữ liệu BEF
     response_bef = requests.get(url_bef)
-    response_bef.encoding = 'utf-8'
+    response_bef.encoding = "utf-8"
     if response_bef.status_code != 200 or not response_bef.text:
         raise ValueError("Không lấy được dữ liệu BEF")
 
     print(response_bef.text)
 
-    parts = response_bef.text.strip().split('o|o')[0].split('|')
+    parts = response_bef.text.strip().split("o|o")[0].split("|")
     if len(parts) < 11:
         raise ValueError("Thiếu dữ liệu BEF")
 
-    result = YearBonus(
+    result = YearBonusResp(
         mnv=parts[0],
         tlcb=parts[1],
         stdltbtn=parts[2],
@@ -210,18 +218,41 @@ def get_year_bonus_by_empid(empid: int, year: int) -> YearBonus:
         xpsongay=parts[7],
         xpsotien=parts[8],
         stienthuong=parts[9],
-        tpnttt=parts[10]
+        tpnttt=parts[10],
     )
 
     # Lấy dữ liệu AFT
     response_aft = requests.get(url_aft)
-    
+
     print(response_aft.text)
-    
-    response_aft.encoding = 'utf-8'
+
+    response_aft.encoding = "utf-8"
     if response_aft.status_code == 200 and response_aft.text.strip():
-        aft_parts = response_aft.text.strip().split('o|o')[0].split('|')
+        aft_parts = response_aft.text.strip().split("o|o")[0].split("|")
         if aft_parts:
             result.tpntst = aft_parts[-1]
 
     return result
+
+
+def get_on_leave_by_empid(empid: str, year: int) -> List[OnLeaveResp]:
+    url = f"{base_url}/s02/VNW00{empid.zfill(5)}vkokv{year}vkokvb"
+    response = requests.get(url)
+    response.encoding = "utf-8"
+
+    if response.status_code != 200 or not response.text.strip():
+        raise ValueError("Không lấy được dữ liệu hoặc dữ liệu rỗng")
+
+    resp = response.text.strip()
+    fields = [f for f in resp.split("o|o") if f.strip()]
+
+    print(resp)
+
+    results = []
+
+    for field in fields:
+        if "|" in field:
+            code, name, quantity = field.split("|")
+            results.append(OnLeaveResp(code=code, name=name, quantity=quantity))
+
+    return results

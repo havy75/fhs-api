@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-class SalaryResponse(BaseModel):
+class SalaryResp(BaseModel):
     tien_phat_thuc_te: float 
     tong_so_luong: float 
 

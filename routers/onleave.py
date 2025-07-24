@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.yearbonus import YearBonusResp
-from services.hrs_api import get_year_bonus_by_empid
+from schemas.onleave import OnLeaveResp
+from services.hrs_api import get_on_leave_by_empid
+from typing import List
+
 
 router = APIRouter()
 
-@router.get("/{empid}/{year}", response_model=YearBonusResp)
-def get_year_bonus(empid: int, year: int):
+from fastapi import HTTPException
+
+@router.get("/{empid}/{year}", response_model=List[OnLeaveResp])
+def get_on_leave(empid: str, year: int):
     try:
-        data = get_year_bonus_by_empid(empid, year)
+        data = get_on_leave_by_empid(empid, year)
         return data
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.employee import EmployeeBase
+from schemas.employee import EmployeeResp
 
 
 from services.hrs_api import get_employee_by_keyword  
 
 router = APIRouter()
 
-@router.get("/{empid}", response_model=EmployeeBase)
+@router.get("/{empid}", response_model=EmployeeResp)
 def get_employee(empid: str):
     data = get_employee_by_keyword(empid)
     if not data:

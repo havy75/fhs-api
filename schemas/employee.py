@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import date
 
-class EmployeeBase(BaseModel):
+class EmployeeResp(BaseModel):
     chinese_name: Optional[str]
     vietnamese_name: Optional[str]
     date_of_birth: Optional[date]
@@ -27,13 +27,13 @@ class EmployeeBase(BaseModel):
     phone_2: Optional[str]
     spouse_name: Optional[str]
 
-class EmployeeCreate(EmployeeBase):
+class EmployeeCreate(EmployeeResp):
     pass  # Bạn có thể thêm field bắt buộc nếu cần
 
-class EmployeeUpdate(EmployeeBase):
+class EmployeeUpdate(EmployeeResp):
     pass  # Dùng cho cập nhật nhân viên
 
-class EmployeeResponse(EmployeeBase):
+class EmployeeResponse(EmployeeResp):
     id: int
 
     class Config:

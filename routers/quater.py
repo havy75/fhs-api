@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.quater import Quarter
+from schemas.quater import QuarterResp
 from services.hrs_api import get_quater_by_empid
 
 router = APIRouter()
 
 from fastapi import HTTPException
 
-@router.get("/{keyword}/{year}/{quater}", response_model=Quarter)
-def get_quater(keyword: str, year: int, quater: int):
+@router.get("/{empid}/{year}/{quater}", response_model=QuarterResp)
+def get_quater(empid: str, year: int, quater: int):
     try:
-        data = get_quater_by_empid(keyword, year, quater)
+        data = get_quater_by_empid(empid, year, quater)
         return data
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))

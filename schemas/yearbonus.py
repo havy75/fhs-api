@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class YearBonus(BaseModel):
+class YearBonusResp(BaseModel):
     id: Optional[int] = None
     mnv: Optional[str] = None           # Mã nhân viên
     tlcb: Optional[str] = None          # Tỷ lệ cơ bản

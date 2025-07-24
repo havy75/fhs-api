@@ -1,8 +1,5 @@
 from pydantic import BaseModel, Field
 
-class ArchivementResponse(BaseModel):
+class ArchivementResp(BaseModel):
     year: str
     score: str
-    
-class ArchivementListResponse(BaseModel):
-    data: list[ArchivementResponse]

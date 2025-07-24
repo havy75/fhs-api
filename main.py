@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 logger = logging.getLogger(__name__)
 
 try:
-    from routers import auth, salary, employee,archivement,quater,yearbonus
+    from routers import auth, salary, employee, archivement, quater, yearbonus, onleave
+
     # from .database.session import create_tables
 except ImportError as e:
     logger.error(f"Failed to import required modules: {str(e)}")
@@ -38,27 +39,27 @@ app.include_router(employee.router, prefix="/api/employee", tags=["employee"])
 app.include_router(archivement.router, prefix="/api/archivement", tags=["archivement"])
 app.include_router(quater.router, prefix="/api/quater", tags=["quater"])
 app.include_router(yearbonus.router, prefix="/api/yearbonus", tags=["yearbonus"])
+app.include_router(onleave.router, prefix="/api/onleave", tags=["onleave"])
 
 @app.get("/", include_in_schema=False)
 def root():
     return JSONResponse(content={"status": "ok"})
 
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def main():
     try:
         logger.info("Starting API server...")
         uvicorn.run(
-            "main:app",
-            host="0.0.0.0",
-            port=1997,
-            reload=True,
-            log_level="info"
+            "main:app", host="0.0.0.0", port=1997, reload=True, log_level="info"
         )
     except Exception as e:
         logger.error(f"Error starting server: {str(e)}")
         raise
+
 
 if __name__ == "__main__":
     main()

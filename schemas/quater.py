@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class Quarter(BaseModel):
+class QuarterResp(BaseModel):
     FirstMonth: float
     SecondMonth: float
     ThirdMonth: float
